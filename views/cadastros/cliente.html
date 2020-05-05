@@ -1,0 +1,79 @@
+{{extend 'layout.html'}}
+
+<div class="container">
+    {{=subTitulo("Dados Cadastrais")}}
+    {{=formCliente.custom.begin}}
+    <div class="row">
+        {{=campo(1,formCliente.custom.label.codcli,formCliente.custom.widget.codcli)}}
+        {{=campo(5,formCliente.custom.label.nomcli,formCliente.custom.widget.nomcli)}}
+        {{=campo(4,formCliente.custom.label.nomfan,formCliente.custom.widget.nomfan)}}
+        {{=campo(2,formCliente.custom.label.codtip,formCliente.custom.widget.codtip)}}
+    </div>
+    <div class="row">
+        {{=campo(2,formCliente.custom.label.fisjur,formCliente.custom.widget.fisjur)}}
+        {{=campo(2,formCliente.custom.label.cgccpf,formCliente.custom.widget.cgccpf)}}
+        {{=campo(2,formCliente.custom.label.insnrg,formCliente.custom.widget.insnrg)}}
+        {{=campo(2,formCliente.custom.label.datfun,formCliente.custom.widget.datfun)}}
+        {{=campo(2,formCliente.custom.label.datcad,formCliente.custom.widget.datcad)}}
+        {{=campo(2,formCliente.custom.label.datalt,formCliente.custom.widget.datalt)}}
+    </div>
+    {{=subTitulo("Contato")}}
+    <div class="row">
+        {{=campo(3,formCliente.custom.label.contat,formCliente.custom.widget.contat)}}
+        {{=campo(2,formCliente.custom.label.telcli,formCliente.custom.widget.telcli)}}
+        {{=campo(2,formCliente.custom.label.celcli,formCliente.custom.widget.celcli)}}
+        {{=campo(5,formCliente.custom.label.emacli,formCliente.custom.widget.emacli)}}
+    </div>
+
+    {{=subTitulo("Endereços")}}
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-item nav-link active" id="nav-geral-tab" data-toggle="tab" href="#nav-geral" role="tab"
+                aria-controls="nav-geral" aria-selected="true">Geral</a>
+            <a class="nav-item nav-link" id="nav-cobranca-tab" data-toggle="tab" href="#nav-cobranca" role="tab"
+                aria-controls="nav-cobranca" aria-selected="false">Cobrança</a>
+            <a class="nav-item nav-link" id="nav-entrega-tab" data-toggle="tab" href="#nav-entrega" role="tab"
+                aria-controls="nav-entrega" aria-selected="false">Entrega</a>
+        </div>
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" id="nav-geral" role="tabpanel" aria-labelledby="nav-geral-tab">
+            <div class="row">
+                {{=campo(4,formCliente.custom.label.endcli,formCliente.custom.widget.endcli)}}
+                {{=campo(1,formCliente.custom.label.numcli,formCliente.custom.widget.numcli)}}
+                {{=campo(2,formCliente.custom.label.baicli,formCliente.custom.widget.baicli)}}
+                {{=campo(2,formCliente.custom.label.cidcli,formCliente.custom.widget.cidcli)}}
+                {{=campo(1,formCliente.custom.label.estcli,formCliente.custom.widget.estcli)}}
+                {{=campo(2,formCliente.custom.label.cepcli,formCliente.custom.widget.cepcli)}}
+            </div>
+        </div>
+        <div class="tab-pane fade" id="nav-cobranca" role="tabpanel" aria-labelledby="nav-cobranca-tab">
+            <div class="row">
+                {{=campo(4,formCliente.custom.label.endcob,formCliente.custom.widget.endcob)}}
+                {{=campo(1,formCliente.custom.label.numcob,formCliente.custom.widget.numcob)}}
+                {{=campo(2,formCliente.custom.label.baicob,formCliente.custom.widget.baicob)}}
+                {{=campo(2,formCliente.custom.label.cidcob,formCliente.custom.widget.cidcob)}}
+                {{=campo(1,formCliente.custom.label.estcob,formCliente.custom.widget.estcob)}}
+                {{=campo(2,formCliente.custom.label.cepcob,formCliente.custom.widget.cepcob)}}
+            </div>
+        </div>
+        <div class="tab-pane fade" id="nav-entrega" role="tabpanel" aria-labelledby="nav-entrega-tab">
+            <div class="row">
+                {{=campo(4,formCliente.custom.label.endent,formCliente.custom.widget.endent)}}
+                {{=campo(1,formCliente.custom.label.nument,formCliente.custom.widget.nument)}}
+                {{=campo(2,formCliente.custom.label.baient,formCliente.custom.widget.baient)}}
+                {{=campo(2,formCliente.custom.label.cident,formCliente.custom.widget.cident)}}
+                {{=campo(1,formCliente.custom.label.estent,formCliente.custom.widget.estent)}}
+                {{=campo(2,formCliente.custom.label.cepent,formCliente.custom.widget.cepent)}}
+            </div>
+        </div>
+    </div>
+    {{=btnRodape(formCliente.custom.submit, btnCancelar)}}
+    {{=formCliente.custom.end}}
+
+
+
+
+
+
+</div>

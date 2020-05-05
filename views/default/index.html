@@ -1,0 +1,19 @@
+{{extend 'layout.html'}}
+
+{{block header}}
+
+{{end}}
+
+<div class="row">
+  <div class="col-md-12">
+    {{if 'message' in globals():}}
+    {{elif 'content' in globals():}}
+    {{=content}}
+    {{else:}}
+    {{=BEAUTIFY(response._vars)}}
+    {{pass}}
+  </div>
+</div>
+
+
+

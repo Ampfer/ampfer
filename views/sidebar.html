@@ -1,0 +1,98 @@
+
+<div class="">
+    <div id="sidebar-wrapper" class="sidebar-toggle">
+        <ul class="sidebar-nav">
+            <li>
+                <a href="#item1">Produtos</a>
+            </li>
+            <li>
+                <a href="#item2">Entradas</a>
+            </li>
+            <li>
+                <a href="#item3">Saídas</a>
+            </li>
+            <li>
+                <a href="#item3">Resumo</a>
+            </li>
+            <li>
+                <a href="#item3">Sair</a>
+            </li>
+        </ul>
+    </div>
+    <main>
+     Conteudo Aqui
+    </main>
+</div>
+
+
+
+
+<style>
+    #sidebar-wrapper {
+        background-color: #51A8B1;
+        color: white;
+        position: fixed;
+        height: 100%;
+        width: 20%;
+        z-index: 1;
+    }
+
+    .sidebar-nav {
+        position: fixed;
+        top: 50;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        width: 20%;
+    }
+
+    .sidebar-nav li {
+        font-size: 20px;
+        text-indent: 55px;
+        line-height: 70px;
+    }
+
+    .sidebar-nav li a {
+        color: white;
+        display: block;
+        text-decoration: none;
+    }
+
+    .sidebar-nav li a:hover {
+        background: #448B93;
+        color: white;
+        text-decoration: none;
+    }
+
+    .sidebar-nav li a:active,
+    .sidebar-nav li a:focus {
+        text-decoration: none;
+    }
+
+    #ufpb-logo {
+        margin-top: 50px;
+        margin-bottom: 50px;
+    }
+
+    #sidebar-wrapper.sidebar-toggle {
+        transition: all 0.3s ease-out;
+    }
+
+    #main {
+        padding-left: 70px;
+
+    }
+
+    @media (min-width: 768px) {
+        #sidebar-wrapper.sidebar-toggle {
+            transition: 0s;
+        }
+    }
+
+    main {
+        width: 80%;
+        margin-left: 20%;
+        height: 100%;
+        position: fixed;
+    }
+</style>

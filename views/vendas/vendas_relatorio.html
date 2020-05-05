@@ -1,0 +1,118 @@
+{{extend 'layout.html'}}
+
+<div class="" >
+    <div id="sidebar-wrapper" class="sidebar-toggle">
+        {{=form_pesq.custom.begin}}
+
+        <div class="pesquisa">
+            {{=form_pesq.custom.label.tipo}}
+            {{=form_pesq.custom.widget.tipo}}
+        </div>
+        <div class="pesquisa">
+            {{=form_pesq.custom.label.vendedor}}
+            {{=form_pesq.custom.widget.vendedor}}
+        </div>
+        <div class="pesquisa">
+            {{=form_pesq.custom.label.dtinicial}}
+            {{=form_pesq.custom.widget.dtinicial}}
+        </div>
+        <div class="pesquisa">
+            {{=form_pesq.custom.label.dtfinal}}
+            {{=form_pesq.custom.widget.dtfinal}}
+        </div>
+
+        <div class="botao" align="center">
+            {{=form_pesq.custom.submit}}
+        </div>
+        {{=form_pesq.custom.end}}
+        <hr>
+        <h4 align="center">Total de Vendas</h4>
+        <h2 align="center">{{=total}}</h2>
+    </div>
+</div>
+<main>
+    <div class="container">
+        <h4 align="center"> Relatório de Vendas </h4>
+        <table id="vendas" class="display" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>Dcto</th>
+                    <th>Data</th>
+                    <th>Cliente</th>
+                    <th>Vendedor</th>
+                    <th>Valor</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{for r in vendas:}}
+                <tr>
+                    <td>{{=r['dcto']}}</td>
+                    <td>{{=r['data']}}</td>
+                    <td>{{=r['cliente']}}</td>
+                    <td>{{=r['vendedor']}}</td>
+                    <td class="text-right">{{=r['valor']}}</td>
+                    <td class="text-right">{{=r['total']}}</td>
+                </tr>
+                {{pass}}
+            </tbody>
+        </table>
+    </div>
+
+</main>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#vendas').DataTable({
+            select: true,
+            paging: false,
+            scrollY: 400,
+            scrollCollapse: true,
+            searching: false,
+            ordering: true,
+            language: { "url": "//cdn.datatables.net/plug-ins/1.10.13/i18n/Portuguese-Brasil.json" },
+        });
+    });
+
+</script>
+
+<style>
+    #sidebar-wrapper {
+        position: fixed;
+        height: 78%;
+        width: 15%;
+        z-index: 1;
+        padding: 15px;
+        background-color: #f1f1f1;
+    }
+
+    #sidebar-wrapper.sidebar-toggle {
+        transition: all 0.3s ease-out;
+    }
+
+    .pesquisa {
+        margin-top: 12px;
+    }
+
+    .botao {
+        margin-top: 20px;
+    }
+
+    #main {
+        padding-left: 70px;
+
+    }
+
+    @media (min-width: 768px) {
+        #sidebar-wrapper.sidebar-toggle {
+            transition: 0s;
+        }
+    }
+
+    main {
+        width: 85%;
+        margin-left: 15%;
+        height: 100%;
+        position: fixed;
+    }
+</style>
