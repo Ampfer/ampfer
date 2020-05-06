@@ -36,8 +36,10 @@ if not request.env.web2py_runtime_gae:
              migrate_enabled=configuration.get('db.migrate'),
              check_reserved=['all'])
 
-    ERPFDB1 = "firebird://sysdba:masterkey@127.0.0.1:3050//lieto/dados/erp.fdb"
-    ERPFDB2 ="firebird://sysdba:masterkey@18.230.73.54:3050//C:\Lieto\Dados\ERP.FDB"
+    if request.env.SERVER_NAME == 'DESKTOP-F8B4BD1':
+        ERPFDB = "firebird://sysdba:masterkey@127.0.0.1:3050//lieto/dados/erp.fdb"
+    else:
+        ERPFDB2 ="firebird://sysdba:masterkey@18.230.73.54:3050/C:\Lieto\Dados\ERP.FDB"
     db = DAL(ERPFDB2,
              migrate_enabled=False,
              ignore_field_case=True,
