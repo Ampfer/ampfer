@@ -39,7 +39,7 @@ if not request.env.web2py_runtime_gae:
     if request.env.SERVER_NAME == 'DESKTOP-F8B4BD1':
         ERPFDB = "firebird://sysdba:masterkey@127.0.0.1:3050//lieto/dados/erp.fdb"
     else:
-        ERPFDB ="firebird://sysdba:masterkey@18.230.73.54:c:\Lieto\Dados\ERP.FDB"
+        ERPFDB ="firebird://sysdba:masterkey@18.230.73.54:3050//c:\Lieto\Dados\ERP.FDB"
     db = DAL(ERPFDB,
              migrate_enabled=False,
              ignore_field_case=True,
