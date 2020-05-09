@@ -5,12 +5,8 @@
         <div class="sidebar-body">
             {{=form_pesq.custom.begin}}
             <div class="item">
-                {{=form_pesq.custom.label.tipo}}
-                {{=form_pesq.custom.widget.tipo}}
-            </div>
-            <div class="item">
-                {{=form_pesq.custom.label.vendedor}}
-                {{=form_pesq.custom.widget.vendedor}}
+                {{=form_pesq.custom.label.produto}}
+                {{=form_pesq.custom.widget.produto}}
             </div>
             <div class="item">
                 {{=form_pesq.custom.label.dtinicial}}
@@ -26,34 +22,36 @@
             </div>
             {{=form_pesq.custom.end}}
             <hr>
-            <h4 align="center">Total de Vendas</h4>
-            <h2 align="center">{{=total}}</h2>
+   
+            <h5 align="center">Saldo</h5>
+            <h4 align="center">{{=saldo}}</h4>
+
         </div>
     </div>
 </div>
 <main>
     <div class="container">
-        <h4 align="center"> Relatório de Vendas </h4>
+        <h4 align="center"> Ficha de Estoque </h4>
         <table id="vendas" class="display" cellspacing="0" width="100%">
             <thead>
                 <tr>
-                    <th>Dcto</th>
                     <th>Data</th>
-                    <th>Cliente</th>
-                    <th>Vendedor</th>
-                    <th>Valor</th>
-                    <th>Total</th>
+                    <th>Dcto</th>
+                    <th>Histórico</th>
+                    <th>Entrada</th>
+                    <th>Saida</th>
+                    <th>Saldo</th>
                 </tr>
             </thead>
             <tbody>
-                {{for r in vendas:}}
+                {{for r in extrato:}}
                 <tr>
-                    <td>{{=r['dcto']}}</td>
                     <td>{{=r['data']}}</td>
-                    <td>{{=r['cliente']}}</td>
-                    <td>{{=r['vendedor']}}</td>
-                    <td class="text-right">{{=r['valor']}}</td>
-                    <td class="text-right">{{=r['total']}}</td>
+                    <td>{{=r['dcto']}}</td>
+                    <td>{{=r['historico']}}</td>
+                    <td class="text-center">{{=r['ent']}}</td>
+                    <td class="text-center">{{=r['sai']}}</td>
+                    <td class="text-center">{{=r['saldo']}}</td>
                 </tr>
                 {{pass}}
             </tbody>
@@ -70,6 +68,7 @@
             scrollY: 400,
             scrollCollapse: true,
             searching: false,
+            order: [1, "asc"],
             ordering: true,
             language: { "url": "//cdn.datatables.net/plug-ins/1.10.13/i18n/Portuguese-Brasil.json" },
         });

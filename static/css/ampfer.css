@@ -1,0 +1,47 @@
+
+#sidebar-wrapper {
+    position: fixed;
+    height: 78%;
+    width: 18%;
+    z-index: 1;
+    background-color: #f1f1f1;
+}
+
+#sidebar-wrapper.sidebar-toggle {
+    transition: all 0.3s ease-out;
+}
+
+.sidebar-body{
+    position: fixed;
+    top: 50;
+    margin: 0;
+    padding: 15px;
+    width: 18%;
+}
+
+.item {
+    margin-top: 12px;
+}
+
+.botao {
+    margin-top: 20px;
+}
+
+#main {
+    padding-left: 70px;
+
+}
+
+@media (min-width: 768px) {
+    #sidebar-wrapper.sidebar-toggle {
+        transition: 0s;
+    }
+}
+
+main {
+    width: 82%;
+    margin-left: 18%;
+    padding-right: 15px;
+    height: 100%;
+    position: fixed;
+}

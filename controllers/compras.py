@@ -18,12 +18,6 @@ def estoque_relatorio():
         keepvalues = True,
     )
     
-    '''
-    resultado = filtrar_estoque(fornecedor,grupo,dtestoque)
-    inventario = resultado[0]
-    estoque = resultado[1]
-    total = resultado[2]
-    '''
     inventario = []
     estoque = total = 0
 
@@ -71,5 +65,99 @@ def filtrar_estoque(fornecedor,grupo,dtestoque):
         inventario.append(dict(codigo = row.codpro, produto=row.nompro, fornecedor = fornecedor,grupo = grupo, estoque= row.qntest,total=valor))
     
     resultado = (inventario,estoque,moeda(total))
+
+    return resultado
+
+@auth.requires_membership('admin')
+def ficha_estoque():
+
+    produto = request.vars.produto if request.vars.produto else None
+    dtfinal = datetime.strptime(request.vars.dtfinal,'%d/%m/%Y').date() if request.vars.dtfinal else request.now
+    if request.vars.dtinicial:
+        dtinicial = datetime.strptime(request.vars.dtinicial,'%d/%m/%Y').date()
+    else:
+        today = datetime.today()
+        dtinicial = datetime(today.year, today.month, 1)
+    
+    extrato = []
+    saldo = 0
+
+    form_pesq = SQLFORM.factory(
+        Field('produto','integer',requires=IS_EMPTY_OR(IS_IN_DB(db,'produtos.codpro','%(nompro)s',zero='Todos')),label='Produto',default = produto),
+        Field('dtinicial','date',requires=data,label='Data Inicial', default = dtinicial),
+        Field('dtfinal','date',requires=data,label='Data Final', default = dtfinal),
+        table_name='pesquisar',
+        submit_button=' Filtrar ',
+        keepvalues = True,
+    )
+
+    if form_pesq.process().accepted:
+        produto = form_pesq.vars.produto
+        dtinicial= form_pesq.vars.dtinicial
+        dtfinal = form_pesq.vars.dtfinal
+
+        resultado = filtrar_ficha_estoque(produto,dtinicial,dtfinal)
+        extrato = resultado[0]
+        saldo = resultado[1]
+
+    elif form_pesq.errors:
+        response.flash = 'Erro no Formulário'
+
+    return dict(form_pesq=form_pesq,extrato=extrato, saldo = saldo)
+
+@auth.requires_membership('admin')
+def filtrar_ficha_estoque(produto,dtinicial,dtfinal):
+
+    query = (Pedidos1.numdoc == Pedidos2.numdoc) & (Pedidos2.codpro == produto) & (Pedidos1.datdoc >= dtinicial) & (Pedidos1.datdoc <= dtfinal)
+    pedidos = db(query).select(orderby = Pedidos1.datdoc)
+    query = (Entradas1.numdoc == Entradas2.numdoc) & (Entradas2.codpro == produto) & (Entradas1.datdoc >= dtinicial) & (Entradas1.datdoc <= dtfinal)
+    entradas = db(query).select(orderby = Entradas1.datdoc)
+    query = (Devolucoes1.numdev == Devolucoes2.numdev) & (Devolucoes2.codpro == produto) & (Devolucoes1.datdev >= dtinicial) & (Devolucoes1.datdev <= dtfinal)
+    devolucoes = db(query).select(orderby = Devolucoes1.datdev)
+    query = (Mestoque.codpro == produto) & (Mestoque.datest >= dtinicial) & (Mestoque.datest <= dtfinal)
+    movimentos = db(query).select(orderby = Mestoque.datest)
+
+    extrato = []
+    saldo = 0
+    for entrada in entradas:
+        fornecedor = Fornecedores[entrada.entradas1.codfor].nomfor
+        dt = entrada.entradas1.datdoc
+        dcto = entrada.entradas1.numdoc
+        historico = fornecedor
+        qtde = entrada.entradas2.qntent
+        extrato.append(dict(data=dt,dcto=dcto, historico=historico, ent = qtde, sai = 0, saldo = 0))
+        saldo = saldo + qtde
+
+    for devolucao in devolucoes:
+        cliente = Clientes[devolucao.devolucoes1.codcli].nomcli
+        dt = devolucao.devolucoes1.datdev
+        dcto = devolucao.devolucoes1.numdev
+        historico = cliente
+        qtde = devolucao.devolucoes2.qntpro
+        extrato.append(dict(data=dt,dcto=dcto, historico=historico, ent = qtde, sai = 0, saldo = 0))
+        saldo = saldo + qtde
+
+    for movimento in movimentos:
+        dt = movimento.movimentos1.datest
+        dcto = movimento.movimentos1.codide
+        historico = movimento.movimentos1.obsest
+        qtde = movimento.movimentos2.qntpro
+        if movimento.movimentos1.entsai == 'S':
+            extrato.append(dict(data=dt,dcto=dcto, historico=historico, ent = 0, sai = qtde, saldo = 0))
+            saldo = saldo - qtde
+        else:
+            extrato.append(dict(data=dt,dcto=dcto, historico=historico, ent = qtde, sai = 0, saldo = 0))
+            saldo = saldo + qtde
+    
+    for pedido in pedidos:
+        cliente = Clientes[pedido.pedidos1.codcli].nomcli
+        dt = pedido.pedidos1.datdoc
+        dcto = pedido.pedidos1.numdoc
+        historico = cliente
+        qtde = pedido.pedidos2.qntpro
+        extrato.append(dict(data=dt,dcto=dcto, historico=historico, ent = 0, sai = qtde, saldo = 0))
+        saldo = saldo - qtde
+
+    resultado = (extrato,saldo)
 
     return resultado

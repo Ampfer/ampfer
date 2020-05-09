@@ -21,6 +21,7 @@ if not configuration.get('app.production'):
         ]),
         (T('Compras'), False, '#', [
             (T('Relatório de Estoque'), False, URL('compras', 'estoque_relatorio')),
+            (T('Ficha do Produto'), False, URL('compras', 'ficha_estoque')),
         ]),
         (T('Vendas'), False, '#', [
             (T('Relatório de Vendas'), False, URL('vendas', 'vendas_relatorio')),

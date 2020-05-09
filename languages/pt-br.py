@@ -135,6 +135,7 @@
 'Estado:': 'Estado:',
 'export as csv file': 'exportar como um arquivo csv',
 'FAQ': 'Perguntas frequentes',
+'Ficha do Produto': 'Ficha do Produto',
 'Filtar': 'Filtar',
 'Financeiro': 'Financeiro',
 'First name': 'Nome',
