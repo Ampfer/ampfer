@@ -45,7 +45,7 @@ if not request.env.web2py_runtime_gae:
              migrate_enabled=False,
              ignore_field_case=True,
              entity_quoting=False,
-             check_reserved=['all'])
+             )
     
 else:
     # ---------------------------------------------------------------------

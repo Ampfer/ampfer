@@ -10,6 +10,13 @@ Cuspro = db.define_table('cuspro',
     migrate = False,
     )
 
+Local = db.define_table('local',
+    Field('codloc','integer',label='Id:'),
+    Field('locest','string',label='Fornecedor:',length=20),
+    primarykey = ['codloc'],
+    migrate = False,
+    )
+
 Entradas1 = db.define_table('entradas1',
     Field('numdoc','integer',label='Documento:'),
     Field('tipdoc','string',label='Tipo:', length=1),

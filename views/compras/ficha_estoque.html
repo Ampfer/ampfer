@@ -16,6 +16,10 @@
                 {{=form_pesq.custom.label.dtfinal}}
                 {{=form_pesq.custom.widget.dtfinal}}
             </div>
+            <div class="item">
+                {{=form_pesq.custom.label.deposito}}
+                {{=form_pesq.custom.widget.deposito}}
+            </div>
 
             <div class="botao" align="center">
                 {{=form_pesq.custom.submit}}
@@ -23,7 +27,7 @@
             {{=form_pesq.custom.end}}
             <hr>
    
-            <h5 align="center">Saldo</h5>
+            <h5 align="center">Saldo Atual</h5>
             <h4 align="center">{{=saldo}}</h4>
 
         </div>
@@ -45,34 +49,33 @@
             </thead>
             <tbody>
                 {{for r in extrato:}}
+                {{saldo = saldo + r['ent']- r['sai']}}
                 <tr>
                     <td>{{=r['data']}}</td>
                     <td>{{=r['dcto']}}</td>
                     <td>{{=r['historico']}}</td>
                     <td class="text-center">{{=r['ent']}}</td>
                     <td class="text-center">{{=r['sai']}}</td>
-                    <td class="text-center">{{=r['saldo']}}</td>
+                    <td class="text-center">{{=saldo}}</td>
                 </tr>
                 {{pass}}
             </tbody>
         </table>
     </div>
-
 </main>
 </div>
 <script>
     $(document).ready(function () {
-        $('#vendas').DataTable({
+        var tabela=$('#vendas').DataTable({
             select: true,
             paging: false,
             scrollY: 400,
             scrollCollapse: true,
             searching: false,
-            order: [1, "asc"],
+            order: [0, "asc"],
             ordering: true,
             language: { "url": "//cdn.datatables.net/plug-ins/1.10.13/i18n/Portuguese-Brasil.json" },
         });
     });
-
 </script>
 
