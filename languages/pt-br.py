@@ -128,6 +128,7 @@
 'Email verified': 'Email verified',
 'Email:': 'Email:',
 'Endereço:': 'Endereço:',
+'Enter a number': 'Enter a number',
 'Enter a value': 'Enter a value',
 'Enter an integer between %(min)g and %(max)g': 'Informe um valor inteiro entre %(min)g e %(max)g',
 'Enter date as %(format)s': 'Enter date as %(format)s',

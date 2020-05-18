@@ -1,0 +1,61 @@
+<div class="container">
+    <table id="produtos" class="display" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Produto</th>
+                <th>Marca</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{for r in produtos:}}
+            <tr id="{{=r['codpro']}}">
+                <td>{{=r['codpro']}}</td>
+                <td>{{=r['nompro']}}</td>
+                <td>{{=r['modelo']}}</td>
+            </tr>
+            {{pass}}
+        </tbody>
+    </table>
+</div>
+<script>
+    $(document).ready(function () {
+        var table = $('#produtos').DataTable({
+            dom: 'Bfrtip',
+            select: true,
+            paging: false,
+            scrollY: 350,
+            scrollCollapse: true,
+            searching: true,
+            order: [0, "asc"],
+            ordering: false,
+            buttons: [{
+                text: 'Selecionar',
+                action: (e, dt, node, config) => {
+                    var resultado = table.rows('.selected').ids();
+                    ids = [];
+                    for (i = 0; i < resultado.length; i++) {
+                        ids[i] = resultado[i];
+                    };
+                    var id = ids[0];
+                    $('#pesquisar_produto').val(id).focus();
+                    hide_modal();
+                }
+            },
+            ],
+            language: { "url": "//cdn.datatables.net/plug-ins/1.10.13/i18n/Portuguese-Brasil.json" },
+        });
+
+        $('#produtos tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+        
+    });
+
+</script>

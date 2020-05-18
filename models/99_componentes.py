@@ -33,6 +33,21 @@ def campo(col,label,widget):
     response = DIV(div1,_class=coluna)
     return response
 
+def campo_pesquisa(col,label,widget,btn):
+    coluna = 'col-md-%s' %(col)
+    div3 = DIV(btn,_class='input-group-btn')
+    div2 = DIV(widget,div3,_class='input-group')
+    div1 = DIV(label,div2,_class='form-group')
+    response = div1 if col == 0 else DIV(div1,_class=coluna)
+    return response
+
+def campo_pesq(label,widget,btn):
+    div3 = DIV(btn,_class='input-group-append')
+    div2 = DIV(widget,div3,_class='input-group mb-3')
+    div1 = DIV(label,div2,_class='form-group')
+    response = div1 
+    return response
+
 def cancelar(url):
     return A('  Cancelar  ', _class="btn btn-secondary",_href=URL(url))
 
@@ -54,7 +69,7 @@ def proximo(url,id):
 def anterior(url,id):
     return A(SPAN(_class="glyphicon glyphicon-chevron-left"), ' Anterior ', _class="btn btn-info",_href=URL(url,args=id))    
 def pesquisar(controle,funcao,titulo):
-    return A(SPAN(_class="btn btn-default glyphicon glyphicon-search"),'',_type="button",_id='pesquisar',
+    return A(XML(SPAN(I(_class="fas fa-search fa-lg"))),_type="button",_id='pesquisar',_class='btn btn-outline-secondary', 
     _onclick="show_modal('%s','%s');" %(URL(controle,funcao,vars={'reload_div':'map'}),titulo))
 def email(idcompra):
     return A(SPAN(_class="glyphicon glyphicon-file"),' Email',_class="btn btn-info",_id='email',

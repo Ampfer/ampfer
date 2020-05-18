@@ -94,6 +94,7 @@ Grupos = db.define_table('grupos',
 Produtos = db.define_table('produtos',
     Field('codpro','integer',label='Código:'),
     Field('nompro','string',label='Produto:',length=50),
+    Field('modelo','string',label='Produto:',length=20),
     Field('unipro','string',label='Unidade:',length=2),
     Field('qntest','decimal(12,4)',label='Estoque:'),
     Field('precus','decimal(15,5)',label='Custo:'),
@@ -107,7 +108,13 @@ Produtos = db.define_table('produtos',
 Produtos.forpri.requires = IS_IN_DB(db,'fornecedores.codfor','%(nomfor)s')
 Produtos.codgru.requires = IS_IN_DB(db,'grupos.codgru','%(nomgru)s')
 
-
+Local = db.define_table('local',
+    Field('codloc','integer',label='Id:'),
+    Field('locest','string',label='Fornecedor:',length=20),
+    primarykey = ['codloc'],
+    migrate = False,
+    format='%(locest)s',
+    )
 
 #Clientes.codcli.writable = False
 

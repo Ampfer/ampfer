@@ -80,8 +80,10 @@ def ficha_estoque():
         dtinicial = datetime(today.year, today.month, 1)
     deposito = request.vars.deposito if request.vars.deposito else None
     
-    extrato = []
-    saldo = 0
+    extrato = ''
+    titulo = 'Ficha de Estoque'
+
+    btnPesquisar = pesquisar('compras','pesquisar_produto','Pesquisar Produto')
 
     form_pesq = SQLFORM.factory(
         Field('produto','integer',requires=IS_EMPTY_OR(IS_IN_DB(db,'produtos.codpro','%(nompro)s',zero=None)),label='Produto',default = produto),
@@ -98,29 +100,48 @@ def ficha_estoque():
         dtinicial= form_pesq.vars.dtinicial
         dtfinal = form_pesq.vars.dtfinal
         deposito = form_pesq.vars.deposito
-
-        resultado = filtrar_ficha_estoque(produto,dtinicial,dtfinal)
-        extrato = resultado[0]
-        saldo = resultado[1]
+        
+        extrato = LOAD('compras','extrato_estoque',args=[produto,dtinicial,dtfinal,deposito], 
+            target='extrato', ajax=True,content='Aguarde, carregando...')
+        
+        titulo = Produtos[produto].nompro
 
     elif form_pesq.errors:
         response.flash = 'Erro no Formulário'
 
-    return dict(form_pesq=form_pesq,extrato=extrato, saldo = saldo)
+    return dict(form_pesq=form_pesq,extrato=extrato, 
+                titulo=titulo,btnPesquisar=btnPesquisar)
 
 @auth.requires_membership('admin')
-def filtrar_ficha_estoque(produtoId,dtinicial,dtfinal):
+def extrato_estoque():
 
-    produto = Produtos[produtoId]
+    produto = int(request.args[0])
+    dtinicial = request.args[1]
+    dtfinal = request.args[2]
+    deposito = None if request.args[3] == 'None' else int(request.args[3])
+    resultado = filtrar_ficha_estoque(produto,dtinicial,dtfinal,deposito)
+    saldo_atual = saldo_estoque(produto,request.now,deposito)
 
-    query = (Pedidos1.numdoc == Pedidos2.numdoc) & (Pedidos2.codpro == produtoId) & (Pedidos1.datdoc >= dtinicial) & (Pedidos1.datdoc <= dtfinal)
-    pedidos = db(query).select(orderby = Pedidos1.datdoc)
-    query = (Entradas1.numdoc == Entradas2.numdoc) & (Entradas2.codpro == produtoId) & (Entradas1.datdoc >= dtinicial) & (Entradas1.datdoc <= dtfinal)
-    entradas = db(query).select(orderby = Entradas1.datdoc)
-    query = (Devolucoes1.numdev == Devolucoes2.numdev) & (Devolucoes2.codpro == produtoId) & (Devolucoes1.datdev >= dtinicial) & (Devolucoes1.datdev <= dtfinal)
-    devolucoes = db(query).select(orderby = Devolucoes1.datdev)
-    query = (Mestoque.codpro == produtoId) & (Mestoque.datest >= dtinicial) & (Mestoque.datest <= dtfinal)
-    movimentos = db(query).select(orderby = Mestoque.datest)
+    return dict(resultado=resultado,saldo_atual=saldo_atual)
+
+@auth.requires_membership('admin')
+def filtrar_ficha_estoque(produtoId,dtinicial,dtfinal, deposito):
+
+    query1 = (Pedidos1.numdoc == Pedidos2.numdoc) & (Pedidos2.codpro == produtoId) & (Pedidos1.datdoc >= dtinicial) & (Pedidos1.datdoc <= dtfinal) 
+    query2 = (Entradas1.numdoc == Entradas2.numdoc) & (Entradas2.codpro == produtoId) & (Entradas1.datdoc >= dtinicial) & (Entradas1.datdoc <= dtfinal)
+    query3 = (Devolucoes1.numdev == Devolucoes2.numdev) & (Devolucoes2.codpro == produtoId) & (Devolucoes1.datdev >= dtinicial) & (Devolucoes1.datdev <= dtfinal)
+    query4 = (Mestoque.codpro == produtoId) & (Mestoque.datest >= dtinicial) & (Mestoque.datest <= dtfinal)
+
+    if deposito:
+        query1 = query1 & (Pedidos2.locest == deposito)
+        query2 = query2 & (Entradas2.locest == deposito)
+        query3 = query3 & (Devolucoes2.locest == deposito)
+        query4 = query4 & (Mestoque.locest == deposito)
+       
+    pedidos = db(query1).select(orderby = Pedidos1.datdoc)
+    entradas = db(query2).select(orderby = Entradas1.datdoc)
+    devolucoes = db(query3).select(orderby = Devolucoes1.datdev)
+    movimentos = db(query4).select(orderby = Mestoque.datest)
 
     extrato = []
     for entrada in entradas:
@@ -129,7 +150,8 @@ def filtrar_ficha_estoque(produtoId,dtinicial,dtfinal):
         dcto = entrada.entradas1.numdoc
         historico = fornecedor
         qtde = entrada.entradas2.qntent
-        extrato.append(dict(data=dt,dcto=dcto, historico=historico, ent = qtde, sai = 0, saldo = 0))
+        tipo = 'Compra'
+        extrato.append(dict(data=dt,dcto=dcto,tipo=tipo, historico=historico, ent = qtde, sai = 0, saldo = 0))
 
     for devolucao in devolucoes:
         cliente = Clientes[devolucao.devolucoes1.codcli].nomcli
@@ -137,17 +159,19 @@ def filtrar_ficha_estoque(produtoId,dtinicial,dtfinal):
         dcto = devolucao.devolucoes1.numdev
         historico = cliente
         qtde = devolucao.devolucoes2.qntpro
-        extrato.append(dict(data=dt,dcto=dcto, historico=historico, ent = qtde, sai = 0, saldo = 0))
+        tipo = 'Devolição'
+        extrato.append(dict(data=dt,dcto=dcto,tipo=tipo, historico=historico, ent = qtde, sai = 0, saldo = 0))
 
     for movimento in movimentos:
-        dt = movimento.movimentos1.datest
-        dcto = movimento.movimentos1.codide
-        historico = movimento.movimentos1.obsest
-        qtde = movimento.movimentos2.qntpro
-        if movimento.movimentos1.entsai == 'S':
-            extrato.append(dict(data=dt,dcto=dcto, historico=historico, ent = 0, sai = qtde, saldo = 0))
+        dt = movimento.datest
+        dcto = movimento.codide
+        historico = movimento.obsest
+        qtde = movimento.qntpro
+        tipo = 'Manual'
+        if movimento.entsai == 'S':
+            extrato.append(dict(data=dt,dcto=dcto,tipo=tipo, historico=historico, ent = 0, sai = qtde, saldo = 0))
         else:
-            extrato.append(dict(data=dt,dcto=dcto, historico=historico, ent = qtde, sai = 0, saldo = 0))
+            extrato.append(dict(data=dt,dcto=dcto,tipo=tipo, historico=historico, ent = qtde, sai = 0, saldo = 0))
     
     for pedido in pedidos:
         cliente = Clientes[pedido.pedidos1.codcli].nomcli
@@ -155,16 +179,113 @@ def filtrar_ficha_estoque(produtoId,dtinicial,dtfinal):
         dcto = pedido.pedidos1.numdoc
         historico = cliente
         qtde = pedido.pedidos2.qntpro
-        extrato.append(dict(data=dt,dcto=dcto, historico=historico, ent = 0, sai = qtde, saldo = 0))
+        tipo = 'Venda'
+        extrato.append(dict(data=dt,dcto=dcto,tipo=tipo, historico=historico, ent = 0, sai = qtde, saldo = 0))
 
+  
+    dtAnt = datetime.strptime(dtinicial, '%Y-%m-%d').date()  - timedelta(days=1)
 
-    dt = dtinicial - timedelta(1)
-    saldo = produto.qntest 
-    extrato.append(dict(data=dt,dcto = '0',historico='Saldo Anterior', ent=0,sai=0,saldo = saldo ))
-    
+    anterior = saldo_estoque(produtoId,dtAnt,deposito)
+    extrato.append(dict(data=dtAnt,dcto = '',tipo='', historico='Saldo Anterior', ent=0,sai=0,saldo = anterior ))
+ 
     extrato = sorted(extrato,  key=lambda k: k['data'])
-
-    resultado = (extrato,saldo)
-
+ 
+    resultado = (extrato,anterior)
 
     return resultado
+
+@auth.requires_membership('admin')
+def saldo_estoque(produto,dt,deposito):
+    q1 = (Entradas1.numdoc == Entradas2.numdoc) & (Entradas2.codpro == produto) & (Entradas1.datdoc <= dt) 
+    q2 = (Pedidos1.numdoc == Pedidos2.numdoc) & (Pedidos2.codpro == produto) & (Pedidos1.datdoc <= dt) 
+    q3 = (Mestoque.codpro == produto) & (Mestoque.datest <= dt) & (Mestoque.entsai == 'E')
+    q4 = (Mestoque.codpro == produto) & (Mestoque.datest <= dt) & (Mestoque.entsai == 'S')
+    q5 = (Devolucoes1.numdev == Devolucoes2.numdev) & (Devolucoes2.codpro == produto) & (Devolucoes1.datdev <= dt) 
+    if deposito:
+        q1 = q1 & (Entradas2.locest == deposito)
+        q2 = q2 & (Pedidos2.locest == deposito)
+        q3 = q3 & (Mestoque.locest == deposito)
+        q4 = q4 & (Mestoque.locest == deposito)
+        q5 = q5 & (Devolucoes2.locest == deposito)
+    
+    sum = Entradas2.qntent.sum()
+    qtEnt = db(q1).select(sum).first()[sum] or 0
+    sum =Pedidos2.qntpro.sum()
+    qtPed = db(q2).select(sum).first()[sum] or 0
+    sum = Mestoque.qntpro.sum()
+    qtMvE = db(q3).select(sum).first()[sum] or 0
+    qtMvS = db(q4).select(sum).first()[sum] or 0
+    sum = Devolucoes2.qntpro.sum()
+    qtDev = db(q5).select(sum).first()[sum] or 0
+
+    sd = qtEnt-qtPed+qtMvE-qtMvS+qtDev
+
+    return sd
+    
+@auth.requires_membership('admin') 
+def ficha_novo():
+    Mestoque.codpro.default = int(request.args[0]) 
+    Mestoque.locest.default = 1
+    Mestoque.datest.default = request.now
+    Mestoque.obsest.default = 'Acerto'
+
+    form = SQLFORM(Mestoque,field_id='codide', _id='formEstoque')
+    
+    def validar(form):
+        if not form.vars.codide:
+            newId = int(db.executesql("select gen_id(GEN_MESTOQUE, 1) from rdb$database;")[0][0])
+            Mestoque.codide.default = newId
+
+    if form.process(onvalidation=validar).accepted:
+        response.flash = 'Salvo com Sucesso!'
+        response.js = "hide_modal(%s);" %("'extrato'")
+
+    elif form.errors:
+        response.flash = 'Erro no Formulário Principal!'
+
+    return dict(form = form)
+
+@auth.requires_membership('admin')
+def pesquisar_produto():
+    produtos = db(Produtos.tabela == 'S').select(Produtos.codpro,Produtos.nompro,Produtos.modelo, orderby = Produtos.nompro).as_list()
+    return dict(produtos=produtos)    
+
+def teste():
+
+    produtoId = int(request.args[0])
+    dtinicial = request.args[1]
+    dtfinal = request.args[2]
+    deposito = request.args[3]
+
+    query2 = (Entradas1.numdoc == Entradas2.numdoc) & (Entradas2.codpro == produtoId) & (Entradas1.datdoc >= dtinicial) & (Entradas1.datdoc <= dtfinal)
+    entradas = db(query2).select(orderby = Entradas1.datdoc)
+    query4 = (Mestoque.codpro == produtoId) & (Mestoque.datest >= dtinicial) & (Mestoque.datest <= dtfinal)
+    movimentos = db(query4).select(orderby = Mestoque.datest)
+    extrato = []
+    for entrada in entradas:
+        fornecedor = Fornecedores[entrada.entradas1.codfor].nomfor
+        dt = str(entrada.entradas1.datdoc)
+        dcto = entrada.entradas1.numdoc
+        historico = fornecedor
+        qtde = float(entrada.entradas2.qntent)
+        tipo = 'Compra'
+        extrato.append(dict(data=dt,dcto=dcto,tipo=tipo, historico=historico, ent = qtde, sai = 0, saldo = 0))
+    for movimento in movimentos:
+        dt = str(movimento.datest)
+        dcto = movimento.codide
+        historico = movimento.obsest
+        qtde = float(movimento.qntpro)
+        tipo = 'Manual'
+        if movimento.entsai == 'S':
+            extrato.append(dict(data=dt,dcto=dcto,tipo=tipo, historico=historico, ent = 0, sai = qtde, saldo = 0))
+        else:
+            extrato.append(dict(data=dt,dcto=dcto,tipo=tipo, historico=historico, ent = qtde, sai = 0, saldo = 0))
+    
+    
+    #extrato = []
+    #extrato.append(dict(dcto = '1', data = '01/05/2020',tipo='b', historico = 'xxx', ent=0,sai=1, saldo = 0))
+    #extrato.append(dict(dcto = '2', data = '02/05/2020',tipo='a', historico = 'xxx', ent=1,sai=0, saldo = 0))
+    import json
+    extrato = json.dumps(extrato)
+    
+    return extrato

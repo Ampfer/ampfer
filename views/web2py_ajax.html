@@ -16,8 +16,15 @@ response.files.insert(3,URL('static','js/web2py.js'))
 response.files.insert(4,URL('static','css/ampfer.css'))
 
 response.files.append('//cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js')
-response.files.append('//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css')
+response.files.append("//cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js")
+response.files.append("//cdn.datatables.net/1.10.21/js/dataTables.bootstrap4.min.js")
+response.files.append("//cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js")
+response.files.append("//cdn.datatables.net/buttons/1.6.2/js/buttons.bootstrap4.min.js")
 
+response.files.append('//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css')
+response.files.append("//cdn.datatables.net/1.10.21/css/dataTables.bootstrap4.min.css")
+response.files.append("//cdn.datatables.net/buttons/1.6.2/css/buttons.bootstrap4.min.css")
+ 
 response.include_meta()
 response.include_files()
 }}

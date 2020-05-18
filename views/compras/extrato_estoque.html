@@ -1,0 +1,70 @@
+<table id="vendas" class="display" cellspacing="0" width="100%">
+    <thead>
+        <tr>
+            <th>Data</th>
+            <th>Dcto</th>
+            <th>Tipo</th>
+            <th>Histórico</th>
+            <th>Entrada</th>
+            <th>Saida</th>
+            <th>Saldo</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{saldo = resultado[1]}}
+        {{for r in resultado[0]:}}
+        {{saldo = saldo + r['ent']- r['sai']}}
+        <tr id="{{=r['dcto']}}">
+            <td>{{=r['data']}}</td>
+            <td>{{=r['dcto']}}</td>
+            <td>{{=r['tipo']}}</td>
+            <td>{{=r['historico']}}</td>
+            <td class="text-center">{{=r['ent']}}</td>
+            <td class="text-center">{{=r['sai']}}</td>
+            <td class="text-center">{{=saldo}}</td>
+        </tr>
+        {{pass}}
+    </tbody>
+</table>
+<h5>Saldo Atual: {{=saldo_atual}}</h5>
+
+
+<script>
+    $(document).ready(function () {
+        var table = $('#vendas').DataTable({
+            dom: 'Bfrtip',
+            select: true,
+            paging: false,
+            scrollY: 320,
+            scrollCollapse: true,
+            searching: true,
+            order: [0, "asc"],
+            ordering: false,
+            buttons: [{
+                text: 'Novo',
+                action: (e, dt, node, config) => { novo(e, dt, node, config) }
+            },
+            { text: 'Alterar' },
+            { text: 'Excluir' },
+            { text: 'Transferir' },
+            ],
+            language: { "url": "//cdn.datatables.net/plug-ins/1.10.13/i18n/Portuguese-Brasil.json" },
+        });
+
+        $('#vendas tbody').on('click', 'tr', function () {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+            }
+            else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+            }
+        });
+
+        const novo = (e, dt, node, config) => {
+            show_modal("{{=URL('compras','ficha_novo', args=[request.args[0]])}}", "Cadastro de Novo Lançamento");
+        };
+
+    });
+
+</script>

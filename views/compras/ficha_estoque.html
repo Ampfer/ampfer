@@ -1,12 +1,12 @@
 {{extend 'layout.html'}}
+{{include 'modal.html'}}
 
 <div class="">
     <div id="sidebar-wrapper" class="sidebar-toggle">
         <div class="sidebar-body">
             {{=form_pesq.custom.begin}}
             <div class="item">
-                {{=form_pesq.custom.label.produto}}
-                {{=form_pesq.custom.widget.produto}}
+                {{=campo_pesq(form_pesq.custom.label.produto,form_pesq.custom.widget.produto,btnPesquisar)}}
             </div>
             <div class="item">
                 {{=form_pesq.custom.label.dtinicial}}
@@ -26,56 +26,15 @@
             </div>
             {{=form_pesq.custom.end}}
             <hr>
-   
-            <h5 align="center">Saldo Atual</h5>
-            <h4 align="center">{{=saldo}}</h4>
-
         </div>
     </div>
 </div>
 <main>
-    <div class="container">
-        <h4 align="center"> Ficha de Estoque </h4>
-        <table id="vendas" class="display" cellspacing="0" width="100%">
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>Dcto</th>
-                    <th>Histórico</th>
-                    <th>Entrada</th>
-                    <th>Saida</th>
-                    <th>Saldo</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{for r in extrato:}}
-                {{saldo = saldo + r['ent']- r['sai']}}
-                <tr>
-                    <td>{{=r['data']}}</td>
-                    <td>{{=r['dcto']}}</td>
-                    <td>{{=r['historico']}}</td>
-                    <td class="text-center">{{=r['ent']}}</td>
-                    <td class="text-center">{{=r['sai']}}</td>
-                    <td class="text-center">{{=saldo}}</td>
-                </tr>
-                {{pass}}
-            </tbody>
-        </table>
+    <div class="container" id='teste'>
+        <h4 align="rigth"> {{=titulo}} </h4>
+        {{=extrato}}
     </div>
 </main>
 </div>
-<script>
-    $(document).ready(function () {
-        var tabela=$('#vendas').DataTable({
-            select: true,
-            paging: false,
-            scrollY: 400,
-            scrollCollapse: true,
-            searching: false,
-            order: [0, "asc"],
-            ordering: true,
-            language: { "url": "//cdn.datatables.net/plug-ins/1.10.13/i18n/Portuguese-Brasil.json" },
-        });
-    });
-</script>
+
 
