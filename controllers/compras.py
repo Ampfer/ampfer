@@ -289,3 +289,20 @@ def teste():
     extrato = json.dumps(extrato)
     
     return extrato
+
+
+def vue():
+    return dict()
+
+def vue1():
+    codpro = request.args[0] if request.args else None
+    if codpro:
+        rows = db(db.produtos.codpro==codpro).select().as_list()
+    else:
+        rows = db(db.produtos.codpro<100).select().as_list()
+    return response.json(rows)
+
+
+
+
+

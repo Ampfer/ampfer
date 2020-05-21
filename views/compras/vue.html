@@ -1,0 +1,38 @@
+{{extend 'layout.html'}}
+
+
+<div id="app">
+    <div v-for="produto in produtos">
+        ${ produto.nompro }
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+
+
+<script>
+
+    var app = new Vue({
+        http: {
+            root: 'http://127.0.0.1:8000/ampfer/rest/api.json/',
+        },
+        mounted: function () {
+            this.$nextTick(function () {
+                var local = {codloc:3,locest: 'bling' };
+                this.$http.put('local/3', local).then(response => {
+                    console.log(response);
+                }, response => {
+                    console.log(response)
+                });
+            })
+        },
+        delimiters: ['${', '}'],
+        el: '#app',
+        data: {
+            message: 'mensagem de teste',
+            produtos: []
+        }
+    })
+</script>
