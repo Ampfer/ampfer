@@ -16,13 +16,12 @@
 
     var app = new Vue({
         http: {
-            root: 'http://127.0.0.1:8000/ampfer/rest/api.json/',
+            root: 'http://localhost:8000/ampfer/rest/api.json',
         },
         mounted: function () {
             this.$nextTick(function () {
-                var local = {codloc:3,locest: 'bling' };
-                this.$http.put('local/3', local).then(response => {
-                    console.log(response);
+                this.$http.get('produtos').then(response => {
+                    this.produtos = response.body.items
                 }, response => {
                     console.log(response)
                 });
